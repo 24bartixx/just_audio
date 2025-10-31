@@ -49,6 +49,7 @@ class JustAudioBackground {
     Duration rewindInterval = const Duration(seconds: 10),
     bool preloadArtwork = false,
     Map<String, dynamic>? androidBrowsableRootExtras,
+    bool showStopAction = false,
   }) async {
     WidgetsFlutterBinding.ensureInitialized();
     await _JustAudioBackgroundPlugin.setup(
@@ -70,6 +71,7 @@ class JustAudioBackground {
       rewindInterval: rewindInterval,
       preloadArtwork: preloadArtwork,
       androidBrowsableRootExtras: androidBrowsableRootExtras,
+      showStopAction: showStopAction,
     );
   }
 }
@@ -92,7 +94,9 @@ class _JustAudioBackgroundPlugin extends JustAudioPlatform {
     Duration rewindInterval = const Duration(seconds: 10),
     bool preloadArtwork = false,
     Map<String, dynamic>? androidBrowsableRootExtras,
+    bool showStopAction = false,
   }) async {
+    showStopAction = showStopAction;
     _platform = JustAudioPlatform.instance;
     JustAudioPlatform.instance = _JustAudioBackgroundPlugin();
     _audioHandler = await AudioService.init(
@@ -122,6 +126,7 @@ class _JustAudioBackgroundPlugin extends JustAudioPlatform {
 
   _JustAudioPlayer? _player;
   String? _playerId;
+  static bool showStopAction = false;
 
   _JustAudioBackgroundPlugin();
 
@@ -768,7 +773,7 @@ class _PlayerAudioHandler extends BaseAudioHandler
     final controls = [
       if (hasPrevious) MediaControl.skipToPrevious,
       if (_playing) MediaControl.pause else MediaControl.play,
-      MediaControl.stop,
+      if (_JustAudioBackgroundPlugin.showStopAction) MediaControl.stop,
       if (hasNext) MediaControl.skipToNext,
     ];
     playbackState.add(playbackState.nvalue!.copyWith(
