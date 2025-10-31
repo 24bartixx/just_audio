@@ -94,7 +94,7 @@ class _JustAudioBackgroundPlugin extends JustAudioPlatform {
     Duration rewindInterval = const Duration(seconds: 10),
     bool preloadArtwork = false,
     Map<String, dynamic>? androidBrowsableRootExtras,
-    bool showStopAction = false,
+    bool showStopAction = true,
   }) async {
     showStopAction = showStopAction;
     _platform = JustAudioPlatform.instance;
