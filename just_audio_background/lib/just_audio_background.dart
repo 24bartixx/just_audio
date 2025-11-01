@@ -12,6 +12,7 @@ export 'package:audio_service/audio_service.dart' show MediaItem;
 
 late SwitchAudioHandler _audioHandler;
 late JustAudioPlatform _platform;
+bool _showStopAction = true;
 
 /// Provides the [init] method to initialise just_audio for background playback.
 class JustAudioBackground {
@@ -49,9 +50,10 @@ class JustAudioBackground {
     Duration rewindInterval = const Duration(seconds: 10),
     bool preloadArtwork = false,
     Map<String, dynamic>? androidBrowsableRootExtras,
-    bool showStopAction = false,
+    bool showStopAction = true,
   }) async {
     WidgetsFlutterBinding.ensureInitialized();
+    _showStopAction = showStopAction;
     await _JustAudioBackgroundPlugin.setup(
       androidResumeOnClick: androidResumeOnClick,
       androidNotificationChannelId: androidNotificationChannelId,
@@ -71,7 +73,6 @@ class JustAudioBackground {
       rewindInterval: rewindInterval,
       preloadArtwork: preloadArtwork,
       androidBrowsableRootExtras: androidBrowsableRootExtras,
-      showStopAction: showStopAction,
     );
   }
 }
@@ -94,9 +95,7 @@ class _JustAudioBackgroundPlugin extends JustAudioPlatform {
     Duration rewindInterval = const Duration(seconds: 10),
     bool preloadArtwork = false,
     Map<String, dynamic>? androidBrowsableRootExtras,
-    bool showStopAction = true,
   }) async {
-    showStopAction = showStopAction;
     _platform = JustAudioPlatform.instance;
     JustAudioPlatform.instance = _JustAudioBackgroundPlugin();
     _audioHandler = await AudioService.init(
@@ -126,7 +125,6 @@ class _JustAudioBackgroundPlugin extends JustAudioPlatform {
 
   _JustAudioPlayer? _player;
   String? _playerId;
-  static bool showStopAction = false;
 
   _JustAudioBackgroundPlugin();
 
@@ -773,7 +771,7 @@ class _PlayerAudioHandler extends BaseAudioHandler
     final controls = [
       if (hasPrevious) MediaControl.skipToPrevious,
       if (_playing) MediaControl.pause else MediaControl.play,
-      if (_JustAudioBackgroundPlugin.showStopAction) MediaControl.stop,
+      if (_showStopAction) MediaControl.stop,
       if (hasNext) MediaControl.skipToNext,
     ];
     playbackState.add(playbackState.nvalue!.copyWith(
